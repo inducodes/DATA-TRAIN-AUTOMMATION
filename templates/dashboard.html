@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>📊 ML Dashboard</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      transition: all 0.3s ease;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      height: 100vh;
+      background-color: #0f0f0f;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      position: relative;
+      flex-direction: column;
+      padding: 30px;
+    }
+
+    /* === Grid Background === */
+    .grid-bg {
+      position: absolute;
+      width: 200%;
+      height: 200%;
+      background-image: 
+        linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px);
+      background-size: 40px 40px;
+      z-index: -3;
+      transform: translate(0px, 0px);
+      will-change: transform;
+    }
+
+    /* === Dashboard Container === */
+    .container {
+      position: relative;
+      padding: 40px;
+      background: #1a1a1a;
+      border-radius: 12px;
+      z-index: 1;
+      width: 100%;
+      max-width: 900px;
+      overflow: auto;
+    }
+
+    .container::before {
+      content: '';
+      position: absolute;
+      top: -2px;
+      left: -2px;
+      right: -2px;
+      bottom: -2px;
+      background: linear-gradient(45deg, 
+        #ff0000, #ff7300, #fffb00, #48ff00,
+        #00ffd5, #002bff, #7a00ff, #ff00aa, #ff0000);
+      background-size: 400%;
+      z-index: -1;
+      border-radius: 14px;
+      animation: borderMove 10s linear infinite;
+    }
+
+    .container::after {
+      content: '';
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      right: 2px;
+      bottom: 2px;
+      background-color: #1a1a1a;
+      border-radius: 10px;
+      z-index: -1;
+    }
+
+    @keyframes borderMove {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    .container h2, h3, h4 {
+      margin-top: 20px;
+    }
+
+    ul {
+      padding-left: 20px;
+    }
+
+    li {
+      margin-bottom: 6px;
+    }
+
+    a {
+      display: inline-block;
+      margin: 10px 0;
+      color: #00ffd5;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    img {
+      max-width: 100%;
+      border-radius: 8px;
+      margin-top: 20px;
+      box-shadow: 0 0 10px rgba(255,255,255,0.2);
+    }
+
+    /* === Toggle Theme Button === */
+    .toggle-theme {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      padding: 6px 12px;
+      background: #444;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      z-index: 10;
+    }
+
+    .toggle-theme:hover {
+      background-color: #666;
+    }
+
+    /* === Day Theme === */
+    body.day {
+      background-color: #f0f0f0;
+      color: #000;
+    }
+
+    body.day .grid-bg {
+      background-image:
+        linear-gradient(rgba(0,0,0,0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,0,0,0.05) 1px, transparent 1px);
+    }
+
+    body.day .container::before {
+      background: linear-gradient(45deg, 
+        #3333ff, #33ccff, #33ff99, #ccff66, #ffff66, #ff9966, #ff6666, #ff3399, #3333ff);
+    }
+
+    body.day .container::after {
+      background-color: #fff;
+    }
+
+    body.day a {
+      color: #0066cc;
+    }
+
+    body.day a:hover {
+      color: #004499;
+    }
+  </style>
+</head>
+<body>
+  <div class="grid-bg" id="grid"></div>
+
+  <button class="toggle-theme" onclick="toggleTheme()">🌓 Toggle Mode</button>
+
+  <div class="container">
+    <h2>✅ Model Training Complete!</h2>
+
+    {% if nulls %}
+      <h4>⚠️ Null Values Handled:</h4>
+      <ul>
+        {% for col, count in nulls.items() %}
+          <li>{{ col }}: {{ count }} nulls</li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+
+    <h4>📈 Data Preview:</h4>
+    {{ data|safe }}
+
+    <h3>🏁 Target Column Detected: <strong>{{ target_col }}</strong></h3>
+    <h3>✅ Best Model: <strong>{{ best_model }}</strong></h3>
+    <h4>🎯 Accuracy: {{ acc }}</h4>
+
+    <img src="{{ img_url }}" alt="Accuracy Chart">
+
+    <a href="{{ model_url }}">⬇️ Download Best Model (.pkl)</a><br>
+    <a href="{{ report_url }}">⬇️ Download Accuracy Report (PDF)</a>
+  </div>
+
+  <script>
+    // Toggle Day/Night Mode
+    function toggleTheme() {
+      document.body.classList.toggle('day');
+    }
+
+    // Mouse effect on background
+    const grid = document.getElementById('grid');
+    document.addEventListener('mousemove', (e) => {
+      const offsetX = (e.clientX / window.innerWidth - 0.5) * 20;
+      const offsetY = (e.clientY / window.innerHeight - 0.5) * 20;
+      grid.style.transform = `translate(${offsetX}px, ${offsetY}px)`;
+    });
+  </script>
+</body>
+</html>
